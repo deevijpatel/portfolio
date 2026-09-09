@@ -2,5 +2,7 @@
   "name": "Deevij Patel — Finance, Strategy & Operations",
   "description": "Deevij Patel — finance and operations professional exploring strategy, business expansion, technology and independent projects.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
