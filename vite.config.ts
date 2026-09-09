@@ -58,32 +58,6 @@ function aistudioMediaPlugin(): Plugin {
           }
         }
 
-        if (req.url === '/api/upload-profile' && req.method === 'POST') {
-          let body = '';
-          req.on('data', (chunk: any) => {
-            body += chunk;
-          });
-          req.on('end', () => {
-            try {
-              const parsed = JSON.parse(body);
-              const base64Data = (parsed.dataUrl || '').replace(/^data:image\/\w+;base64,/, '');
-              const buffer = Buffer.from(base64Data, 'base64');
-              const publicDir = path.resolve(__dirname, 'public');
-              if (!fs.existsSync(publicDir)) {
-                fs.mkdirSync(publicDir, { recursive: true });
-              }
-              fs.writeFileSync(path.resolve(publicDir, 'P1185306.JPG'), buffer);
-              fs.writeFileSync(path.resolve(publicDir, 'deevij-patel.jpg'), buffer);
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ success: true }));
-            } catch (err: any) {
-              res.statusCode = 500;
-              res.end(JSON.stringify({ error: err.message }));
-            }
-          });
-          return;
-        }
-
         next();
       });
     },

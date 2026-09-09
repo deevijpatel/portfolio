@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUpRight, Linkedin, Mail, ShieldCheck } from 'lucide-rea
 import { motion, AnimatePresence } from 'motion/react';
 import { HERO_DATA } from '../data/portfolioData';
 import { playUiSound } from '../utils/sound';
+import deevijPhoto from '../assets/deevij-patel.jpg';
 
 interface HeroProps {
   onExploreWork: () => void;
@@ -168,9 +169,14 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onConnect }) => {
                 {/* Profile Photo Container */}
                 <div className="relative overflow-hidden rounded-[2px] bg-neutral-950 border border-white/15 aspect-[3/4]">
                   <img
-                    src="/P1185306.JPG"
+                    src={deevijPhoto}
                     alt="Deevij Patel - Finance, Founder's Office & Operations"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      if (e.currentTarget.src !== '/P1185306.JPG') {
+                        e.currentTarget.src = '/P1185306.JPG';
+                      }
+                    }}
                     className="w-full h-full object-cover object-[center_12%] filter brightness-[1.03] contrast-[1.06] group-hover:scale-[1.02] transition-transform duration-500"
                   />
 
