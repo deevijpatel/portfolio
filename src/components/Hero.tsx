@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowDown, ArrowUpRight, Linkedin, Mail, ShieldCheck, Camera, UploadCloud, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowDown, ArrowUpRight, Linkedin, Mail, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { HERO_DATA } from '../data/portfolioData';
 import { playUiSound } from '../utils/sound';
@@ -11,15 +11,6 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onExploreWork, onConnect }) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Primary image source is P1185306.JPG (or locally cached version)
-  const [profilePhoto, setProfilePhoto] = useState<string>(() => {
-    return localStorage.getItem('deevij_patel_profile_pic') || '/P1185306.JPG';
-  });
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
-  const [hasError, setHasError] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,54 +18,6 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onConnect }) => {
     }, 2400);
     return () => clearInterval(timer);
   }, []);
-
-  const handleFile = (file: File) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const result = e.target?.result as string;
-      if (result) {
-        setProfilePhoto(result);
-        setImageLoaded(true);
-        setHasError(false);
-        try {
-          localStorage.setItem('deevij_patel_profile_pic', result);
-        } catch {
-          // localStorage quota catch
-        }
-        playUiSound('pop');
-
-        // Persist to public/P1185306.JPG via Vite dev server middleware
-        try {
-          await fetch('/api/upload-profile', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dataUrl: result }),
-          });
-        } catch {
-          // Silent fallback if offline
-        }
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
 
   return (
     <section
@@ -207,95 +150,31 @@ export const Hero: React.FC<HeroProps> = ({ onExploreWork, onConnect }) => {
               transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
               className="relative w-full max-w-sm sm:max-w-md group"
             >
-              {/* Hidden file input for P1185306.JPG */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleFile(e.target.files[0]);
-                  }
-                }}
-              />
-
               {/* High-contrast ambient backlight halo with gentle breathing glow */}
               <motion.div
-                animate={{ opacity: [0.65, 0.95, 0.65] }}
+                animate={{ opacity: [0.55, 0.85, 0.55] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -inset-1.5 bg-gradient-to-tr from-[#ff4b3e]/40 via-white/25 to-[#ff4b3e]/15 rounded-sm blur-lg"
+                className="absolute -inset-1.5 bg-gradient-to-tr from-[#ff4b3e]/40 via-white/20 to-[#ff4b3e]/15 rounded-sm blur-lg"
               />
 
               {/* Outer Architectural Container with high contrast border */}
-              <div
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                className={`relative p-2.5 bg-neutral-900/95 border-2 rounded-sm shadow-2xl shadow-black transition-all duration-300 ${
-                  isDragging
-                    ? 'border-[#ff4b3e] scale-[1.01]'
-                    : 'border-white/30 hover:border-white/50'
-                }`}
-              >
+              <div className="relative p-2.5 bg-neutral-900/95 border-2 border-white/25 hover:border-white/40 rounded-sm shadow-2xl shadow-black transition-all duration-300">
                 {/* Viewfinder Technical Corner Accents */}
                 <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-[#ff4b3e] z-20" />
                 <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-[#ff4b3e] z-20" />
                 <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-[#ff4b3e] z-20" />
                 <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#ff4b3e] z-20" />
 
-                {/* Profile Container */}
+                {/* Profile Photo Container */}
                 <div className="relative overflow-hidden rounded-[2px] bg-neutral-950 border border-white/15 aspect-[3/4]">
-                  {!hasError ? (
-                    <>
-                      <img
-                        src={profilePhoto}
-                        alt="Deevij Patel - Strategy, Operations, and Finance"
-                        referrerPolicy="no-referrer"
-                        onLoad={() => {
-                          setImageLoaded(true);
-                          setHasError(false);
-                        }}
-                        onError={() => {
-                          setHasError(true);
-                        }}
-                        className="w-full h-full object-cover object-center filter brightness-[1.04] contrast-[1.10] group-hover:scale-[1.02] transition-transform duration-500"
-                      />
+                  <img
+                    src="/P1185306.JPG"
+                    alt="Deevij Patel - Finance, Founder's Office & Operations"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover object-[center_12%] filter brightness-[1.03] contrast-[1.06] group-hover:scale-[1.02] transition-transform duration-500"
+                  />
 
-                      {/* Top Action Overlay: Update / Change Photo */}
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        type="button"
-                        title="Click to update or re-upload P1185306.JPG"
-                        className="absolute top-3 right-3 px-2.5 py-1 bg-black/85 hover:bg-[#ff4b3e] text-neutral-300 hover:text-white border border-white/20 hover:border-transparent rounded-sm text-[10px] font-mono tracking-wider uppercase flex items-center gap-1.5 backdrop-blur-md transition-all z-20 shadow-lg cursor-pointer opacity-90 group-hover:opacity-100"
-                      >
-                        <RefreshCw size={11} />
-                        <span>Update Picture</span>
-                      </button>
-                    </>
-                  ) : (
-                    /* Fallback interactive dropzone if P1185306.JPG is pending */
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer bg-neutral-950/95 hover:bg-neutral-900/90 transition-colors group/drop"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-neutral-900 border border-[#ff4b3e]/40 flex items-center justify-center text-[#ff4b3e] mb-4 group-hover/drop:scale-110 group-hover/drop:border-[#ff4b3e] transition-all shadow-lg shadow-[#ff4b3e]/10">
-                        <Camera size={28} />
-                      </div>
-                      <div className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <span>P1185306.JPG</span>
-                      </div>
-                      <p className="text-[11px] font-sans text-neutral-400 max-w-[220px] mb-4">
-                        Click here or drop your photograph (P1185306.JPG) to display your verified portrait
-                      </p>
-                      <div className="px-4 py-2 bg-[#ff4b3e] hover:bg-[#e03d31] text-white text-[11px] font-mono font-semibold uppercase tracking-wider rounded-sm flex items-center gap-2 shadow-lg shadow-[#ff4b3e]/20">
-                        <UploadCloud size={14} />
-                        <span>Select P1185306.JPG</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Top-left subtle metadata badge */}
+                  {/* Top-left subtle status badge */}
                   <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/85 backdrop-blur-md border border-white/20 rounded-sm flex items-center gap-1.5 shadow-lg z-10">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-[10px] font-mono font-semibold tracking-wider text-neutral-200 uppercase">
